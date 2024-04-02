@@ -1,7 +1,6 @@
 package be.vdab.geld.mensen;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,5 +19,17 @@ public class MensService {
     @Transactional
     public long create(Mens mens) {
         return mensRepository.create(mens);
+    }
+    @Transactional
+    public void schenk(Schenking schenking) {
+        long vanMensId = schenking.getVanMensId();
+        Mens vanMens = mensRepository.findAndLockById(vanMensId)
+                .orElseThrow(() -> new MensNietGevondenException(vanMensId));
+        long aanMensId = schenking.getAanMensId();
+        Mens aanMens = mensRepository.findAndLockById(aanMensId)
+                .orElseThrow(() -> new MensNietGevondenException(aanMensId));
+        vanMens.schenk(aanMens, schenking.getBedrag());
+        mensRepository.update(vanMens);
+        mensRepository.update(aanMens);
     }
 }
