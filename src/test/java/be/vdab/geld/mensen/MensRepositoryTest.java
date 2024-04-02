@@ -70,12 +70,12 @@ public class MensRepositoryTest {
     }
     @Test
     void findAndLockByIdMetBestaandeIdVindtEenMens() {
-        assertThat(mensRepository.findById(idVanTestMens1())).hasValueSatisfying(
+        assertThat(mensRepository.findAndLockById(idVanTestMens1())).hasValueSatisfying(
                 mens -> assertThat(mens.getNaam()).isEqualTo("test1"));
     }
     @Test
     void findAndLoclByIdMetOnbestaandeIdVindtGeenMens() {
-        assertThat(mensRepository.findById(Long.MAX_VALUE)).isEmpty();
+        assertThat(mensRepository.findAndLockById(Long.MAX_VALUE)).isEmpty();
     }
     @Test
     void updateWijzigtEenMens() {
@@ -103,5 +103,4 @@ public class MensRepositoryTest {
                 .allSatisfy(geld -> assertThat(geld).isBetween(van, tot))
                 .isSorted();
     }
-
 }
