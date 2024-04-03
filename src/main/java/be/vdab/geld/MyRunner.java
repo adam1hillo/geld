@@ -1,14 +1,8 @@
 package be.vdab.geld;
 
-import be.vdab.geld.mensen.MensNietGevondenException;
 import be.vdab.geld.mensen.MensService;
-import be.vdab.geld.mensen.OnvoldoendeGeldException;
-import be.vdab.geld.mensen.Schenking;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.util.Scanner;
 
 @Component
 public class MyRunner implements CommandLineRunner {
@@ -20,7 +14,7 @@ public class MyRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
+        /*Scanner scanner = new Scanner(System.in);
         System.out.println("Id van mens:");
         int vanMensId = scanner.nextInt();
         System.out.println("Id aan mens:");
@@ -37,7 +31,7 @@ public class MyRunner implements CommandLineRunner {
             System.err.println("Schenking mislukt. Mens ontbreekt. Id: " + ex.getId());
         } catch (OnvoldoendeGeldException ex) {
             System.err.println("Schenking mislukt. Onvoldoende geld.");
-        }
-
+        }*/
+        mensService.findSchenkStatistiekPerMens().forEach(System.out::println);
     }
 }

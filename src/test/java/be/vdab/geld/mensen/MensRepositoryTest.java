@@ -8,12 +8,13 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
 @JdbcTest
 @Import(MensRepository.class)
-@Sql("/mensen.sql")
+@Sql({"/mensen.sql", "/schenkingen.sql"})
 public class MensRepositoryTest {
     private final MensRepository mensRepository;
     private final JdbcClient jdbcClient;
@@ -48,6 +49,11 @@ public class MensRepositoryTest {
 
     private long idVanTestMens1() {
         return jdbcClient.sql("select id from mensen where naam = 'test1'")
+                .query(Long.class)
+                .single();
+    }
+    private long idVanTestMens2() {
+        return jdbcClient.sql("select id from mensen where naam = 'test2'")
                 .query(Long.class)
                 .single();
     }
@@ -102,5 +108,21 @@ public class MensRepositoryTest {
                 .extracting(Mens::getGeld)
                 .allSatisfy(geld -> assertThat(geld).isBetween(van, tot))
                 .isSorted();
+    }
+    @Test
+    void findSchenkStatistiekPerMensVindtDeJuisteData() {
+        List<SchenkStatistiekPerMens> statistiek = mensRepository.findSchenkStatistiekPerMens();
+        var aantalRecords = jdbcClient.sql("select count(distinct vanMensId) from schenkingen")
+                                        .query(Integer.class)
+                                        .single();
+        assertThat(statistiek).hasSize(aantalRecords)
+                                .extracting(SchenkStatistiekPerMens::id).isSorted();
+        var idVanTestMens2 = idVanTestMens2();
+        assertThat(statistiek).anySatisfy(eenItem -> {
+            assertThat(eenItem.id()).isEqualTo(idVanTestMens2);
+            assertThat(eenItem.naam()).isEqualTo("test2");
+            assertThat(eenItem.aantal()).isEqualTo(2);
+            assertThat(eenItem.totaal()).isEqualByComparingTo("300");
+        });
     }
 }

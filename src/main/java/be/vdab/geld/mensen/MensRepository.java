@@ -103,4 +103,16 @@ public class MensRepository {
                 .query(Mens.class)
                 .optional();
     }
+    public List<SchenkStatistiekPerMens> findSchenkStatistiekPerMens() {
+        String sql = """
+                select mensen.id, naam, count(schenkingen.id) as aantal, sum(bedrag) as totaal
+                from mensen inner join schenkingen
+                on mensen.id = schenkingen.vanMensId
+                group by mensen.id
+                order by mensen.id
+                """;
+        return jdbcClient.sql(sql)
+                .query(SchenkStatistiekPerMens.class)
+                .list();
+    }
 }
